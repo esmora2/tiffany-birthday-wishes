@@ -52,19 +52,25 @@ netlify deploy --prod
 
 ## 🔧 Configuración
 
-### Variables de entorno (opcional)
+### Variables de entorno (REQUERIDAS)
 
-Si quieres usar una base de datos externa como Supabase en lugar de Netlify Blobs:
+El proyecto usa **Supabase** (base de datos) + **AWS S3 + CloudFront** (almacenamiento de imágenes).
 
+#### Variables de Supabase
 1. Ve a Site settings → Environment variables en Netlify
 2. Añade:
    - `SUPABASE_URL`: URL de tu proyecto Supabase
-   - `SUPABASE_KEY`: Anon key de Supabase
+   - `SUPABASE_ANON_KEY`: Anon key de Supabase
 
-### Netlify Blobs
+#### Variables de AWS S3 + CloudFront
+Añade estas variables para almacenar imágenes en S3:
+   - `AWS_ACSS_KEY_ID`: Tu access key de AWS
+   - `AWS_SCRT_ACCESS_KEY`: Tu secret access key
+   - `AWS_STORAGE_BUCKET_NAME`: Nombre del bucket (ej: `imagesbucketxse`)
+   - `AWS_S3_CUSTOM_DOMAIN`: Dominio de CloudFront (ej: `d2i...a86dq.cloudfront.net`)
+   - `AWS_RGN`: Región de AWS (ej: `us-east-1`)
 
-El proyecto usa Netlify Blobs por defecto (incluido gratis en todos los planes).
-No requiere configuración adicional - funcionará automáticamente al hacer deploy.
+**📖 Ver [AWS_S3_SETUP.md](./AWS_S3_SETUP.md) para configuración detallada**
 
 ## 📱 Rutas de la aplicación
 
@@ -107,11 +113,15 @@ Esto iniciará un servidor local en `http://localhost:8888` con las funciones se
 
 ## 📝 Notas importantes
 
-1. **Imágenes**: Las fotos se guardan en base64 dentro de Netlify Blobs. Para proyectos con muchas imágenes grandes, considera usar un servicio de almacenamiento de imágenes como Cloudinary.
+1. **Imágenes**: Las fotos se suben a **AWS S3** y se sirven a través de **CloudFront CDN** para mejor rendimiento. La base de datos solo guarda las URLs.
 
-2. **Límite de almacenamiento**: Netlify Blobs tiene límites según el plan. El plan gratuito incluye 1GB.
+2. **Migración de fotos antiguas**: Si ya tienes mensajes con fotos en base64, usa el script `migrate-base64-to-s3.js` para migrarlas a S3.
 
-3. **Seguridad del panel admin**: La ruta `/77726b3` no está protegida con autenticación. Solo compártela con personas de confianza. Para mayor seguridad, considera añadir Netlify Identity.
+3. **Límite de almacenamiento**: S3 tiene costos muy bajos. CloudFront incluye 1TB/mes gratis en la capa gratuita.
+
+4. **Seguridad del panel admin**: La ruta `/77726b3` no está protegida con autenticación. Solo compártela con personas de confianza. Para mayor seguridad, considera añadir Netlify Identity.
+
+5. **Optimización de imágenes**: Las imágenes se convierten automáticamente a JPEG con compresión 85% y se redimensionan a máximo 1920px.
 
 ## 🎁 Créditos
 
