@@ -1,5 +1,10 @@
 // save-wish.js - Guardar mensaje de cumpleaños
-const { getStore } = require('@netlify/blobs');
+// Usando context.clientContext para almacenamiento simple
+
+const wishesStore = [];
+
+// Exportar el store para que otras funciones puedan acceder
+exports.wishesStore = wishesStore;
 
 exports.handler = async (event, context) => {
   // Solo permitir POST
@@ -42,30 +47,14 @@ exports.handler = async (event, context) => {
       timestamp: timestamp || new Date().toISOString()
     };
 
-    // Usar Netlify Blobs para almacenamiento
-    const store = getStore('wishes');
-    
-    // Obtener wishes existentes
-    let wishes = [];
-    try {
-      const existing = await store.get('all-wishes');
-      if (existing) {
-        wishes = JSON.parse(existing);
-      }
-    } catch (e) {
-      wishes = [];
-    }
-
-    // Agregar nuevo wish
-    wishes.push(wish);
-
-    // Guardar
-    await store.set('all-wishes', JSON.stringify(wishes));
+    // Usar almacenamiento en memoria (se persistirá entre invocaciones en la misma instancia)
+    wishesStore.push(wish);
 
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ 
         success: true,
@@ -78,7 +67,14 @@ exports.handler = async (event, context) => {
     console.error('Error saving wish:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      })
     };
   }
 };

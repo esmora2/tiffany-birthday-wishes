@@ -1,4 +1,6 @@
 // delete-wish.js - Eliminar un mensaje (solo admin)
+const saveWishModule = require('./save-wish');
+
 exports.handler = async (event, context) => {
   // Solo permitir POST
   if (event.httpMethod !== 'POST') {
@@ -18,30 +20,19 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const { getStore } = require('@netlify/blobs');
-    const store = getStore('wishes');
-    
-    // Obtener wishes existentes
-    let wishes = [];
-    try {
-      const data = await store.get('all-wishes');
-      if (data) {
-        wishes = JSON.parse(data);
-      }
-    } catch (e) {
-      wishes = [];
-    }
-
     // Filtrar (eliminar el wish con el ID especificado)
-    wishes = wishes.filter(wish => wish.id !== id);
-
-    // Guardar
-    await store.set('all-wishes', JSON.stringify(wishes));
+    const wishes = saveWishModule.wishesStore || [];
+    const index = wishes.findIndex(wish => wish.id === id);
+    
+    if (index > -1) {
+      wishes.splice(index, 1);
+    }
 
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ 
         success: true,
@@ -53,7 +44,14 @@ exports.handler = async (event, context) => {
     console.error('Error deleting wish:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      })
     };
   }
 };

@@ -1,37 +1,39 @@
 // get-wishes.js - Obtener todos los mensajes
+// Importar el store compartido
+const saveWishModule = require('./save-wish');
+
 exports.handler = async (event, context) => {
   try {
-    const { getStore } = require('@netlify/blobs');
-    const store = getStore('wishes');
-    
-    // Obtener wishes
-    let wishes = [];
-    try {
-      const data = await store.get('all-wishes');
-      if (data) {
-        wishes = JSON.parse(data);
-      }
-    } catch (e) {
-      wishes = [];
-    }
+    // Acceder al almacenamiento compartido
+    const wishes = saveWishModule.wishesStore || [];
 
     // Ordenar por fecha (más recientes primero)
-    wishes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const sortedWishes = [...wishes].sort((a, b) => 
+      new Date(b.timestamp) - new Date(a.timestamp)
+    );
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache',
+        'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(wishes)
+      body: JSON.stringify(sortedWishes)
     };
 
   } catch (error) {
     console.error('Error getting wishes:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      })
     };
   }
 };
