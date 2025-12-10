@@ -8,12 +8,17 @@
     "build": "echo 'No build needed - static site'",
     "deploy": "netlify deploy --prod"
   },
-  "keywords": ["birthday", "wishes", "netlify"],
+  "keywords": [
+    "birthday",
+    "wishes",
+    "netlify"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@netlify/blobs": "^7.0.0",
     "@netlify/functions": "^2.4.0",
-    "@netlify/blobs": "^7.0.0"
+    "@supabase/supabase-js": "^2.87.1"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"

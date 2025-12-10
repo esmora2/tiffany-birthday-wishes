@@ -1,5 +1,10 @@
-// delete-wish.js - Eliminar un mensaje (solo admin)
-const saveWishModule = require('./save-wish');
+// delete-wish.js - Eliminar un mensaje (solo admin) usando service key
+const { createClient } = require('@supabase/supabase-js');
+
+// Inicializar cliente de Supabase con service key (privilegios de admin)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 exports.handler = async (event, context) => {
   // Solo permitir POST
@@ -20,12 +25,15 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Filtrar (eliminar el wish con el ID especificado)
-    const wishes = saveWishModule.wishesStore || [];
-    const index = wishes.findIndex(wish => wish.id === id);
-    
-    if (index > -1) {
-      wishes.splice(index, 1);
+    // Eliminar de Supabase
+    const { error } = await supabase
+      .from('birthday_wishes')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
 
     return {

@@ -1,10 +1,10 @@
-// save-wish.js - Guardar mensaje de cumpleaños
-// Usando context.clientContext para almacenamiento simple
+// save-wish.js - Guardar mensaje de cumpleaños usando Supabase
+const { createClient } = require('@supabase/supabase-js');
 
-const wishesStore = [];
-
-// Exportar el store para que otras funciones puedan acceder
-exports.wishesStore = wishesStore;
+// Inicializar cliente de Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
   // Solo permitir POST
@@ -47,8 +47,16 @@ exports.handler = async (event, context) => {
       timestamp: timestamp || new Date().toISOString()
     };
 
-    // Usar almacenamiento en memoria (se persistirá entre invocaciones en la misma instancia)
-    wishesStore.push(wish);
+    // Guardar en Supabase
+    const { data: insertedData, error } = await supabase
+      .from('birthday_wishes')
+      .insert([wish])
+      .select();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     return {
       statusCode: 200,

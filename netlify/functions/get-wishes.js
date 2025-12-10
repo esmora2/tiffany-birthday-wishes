@@ -1,16 +1,23 @@
-// get-wishes.js - Obtener todos los mensajes
-// Importar el store compartido
-const saveWishModule = require('./save-wish');
+// get-wishes.js - Obtener todos los mensajes desde Supabase
+const { createClient } = require('@supabase/supabase-js');
+
+// Inicializar cliente de Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
   try {
-    // Acceder al almacenamiento compartido
-    const wishes = saveWishModule.wishesStore || [];
+    // Obtener todos los mensajes de Supabase
+    const { data: wishes, error } = await supabase
+      .from('birthday_wishes')
+      .select('*')
+      .order('timestamp', { ascending: false });
 
-    // Ordenar por fecha (más recientes primero)
-    const sortedWishes = [...wishes].sort((a, b) => 
-      new Date(b.timestamp) - new Date(a.timestamp)
-    );
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     return {
       statusCode: 200,
@@ -19,7 +26,7 @@ exports.handler = async (event, context) => {
         'Cache-Control': 'no-cache',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(sortedWishes)
+      body: JSON.stringify(wishes || [])
     };
 
   } catch (error) {
