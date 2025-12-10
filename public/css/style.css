@@ -1,16 +1,16 @@
-/* Colores inspirados en LaraBirthday: tonos pastel suaves */
+/* Colores inspirados en azul marino y azul pastel */
 :root {
-  --color-primary: #ee9ca7;
-  --color-secondary: #66cccc;
-  --color-tertiary: #ffcc66;
-  --color-quaternary: #00cc99;
-  --color-bg-gradient-1: #ffdde1;
-  --color-bg-gradient-2: #ee9ca7;
+  --color-primary: #4a90e2;
+  --color-secondary: #7bb3ff;
+  --color-tertiary: #a8d8ff;
+  --color-quaternary: #2c5f8d;
+  --color-bg-gradient-1: #d4e8ff;
+  --color-bg-gradient-2: #5a9fd4;
   --color-text: #333;
   --color-text-light: #666;
   --color-white: #fff;
   --color-shadow: rgba(0, 0, 0, 0.1);
-  --color-success: #00cc99;
+  --color-success: #4caf50;
   --color-danger: #ff6b6b;
 }
 
@@ -162,7 +162,7 @@ body {
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 204, 153, 0.4);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
 }
 
 .btn-primary:disabled {
@@ -204,12 +204,23 @@ body {
   color: var(--color-primary);
 }
 
-/* Board styles */
+/* Board styles - Collage dinámico tipo masonry */
 .board-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  column-count: 3;
+  column-gap: 1.5rem;
   margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .board-grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .board-grid {
+    column-count: 1;
+  }
 }
 
 .wish-card {
@@ -220,19 +231,75 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: fadeIn 0.5s ease;
   break-inside: avoid;
-}
-
-.wish-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
 }
 
 .wish-card-image {
   width: 100%;
-  height: 200px;
+  height: auto;
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 1rem;
+  display: block;
+}
+
+/* Variaciones de tamaño para crear dinamismo */
+.wish-card:nth-child(3n+1) {
+  transform: scale(1.05);
+}
+
+.wish-card:nth-child(5n+2) {
+  transform: scale(0.95);
+}
+
+.wish-card:nth-child(7n+3) {
+  transform: scale(1.02);
+}
+
+/* Rotaciones sutiles para efecto collage */
+.wish-card:nth-child(4n+1) {
+  transform: rotate(-1deg);
+}
+
+.wish-card:nth-child(4n+2) {
+  transform: rotate(1deg);
+}
+
+.wish-card:nth-child(4n+3) {
+  transform: rotate(-0.5deg);
+}
+
+/* Colores de fondo pastel variados para tarjetas sin imagen */
+.wish-card:nth-child(6n+1) {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.wish-card:nth-child(6n+2) {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+
+.wish-card:nth-child(6n+3) {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+.wish-card:nth-child(6n+4) {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.wish-card:nth-child(6n+5) {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+}
+
+.wish-card:nth-child(6n) {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+}
+
+/* Al hacer hover, resetear rotación y escalar */
+.wish-card:hover {
+  transform: translateY(-5px) rotate(0deg) scale(1.03) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .wish-card-name {
