@@ -8,21 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const formCard = document.getElementById('formCard');
     const successMessage = document.getElementById('successMessage');
 
-    // Preview de imagen
-    photoInput.addEventListener('change', (e) => {
+    // Preview de imagen con conversión automática
+    photoInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (file) {
             fileName.textContent = file.name;
             
-            // Mostrar preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
-            reader.readAsDataURL(file);
+            try {
+                // Convertir cualquier formato a JPEG/PNG compatible con navegadores
+                const convertedImage = await convertImageToWebFormat(file);
+                
+                // Mostrar preview
+                imagePreview.innerHTML = `<img src="${convertedImage}" alt="Preview">`;
+                
+                // Guardar la imagen convertida para usar después
+                photoInput.convertedImage = convertedImage;
+            } catch (error) {
+                console.error('Error al procesar imagen:', error);
+                alert('Hubo un problema al procesar tu imagen. Intenta con otra foto.');
+                fileName.textContent = '';
+                imagePreview.innerHTML = '';
+                photoInput.value = '';
+            }
         } else {
             fileName.textContent = '';
             imagePreview.innerHTML = '';
+            delete photoInput.convertedImage;
         }
     });
 
@@ -45,9 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const photoFile = photoInput.files[0];
         if (photoFile) {
-            // Convertir imagen a base64
-            const base64 = await fileToBase64(photoFile);
-            formData.append('photo', base64);
+            // Usar imagen convertida si existe, sino convertir ahora
+            const imageData = photoInput.convertedImage || await convertImageToWebFormat(photoFile);
+            formData.append('photo', imageData);
         }
 
         // Deshabilitar botón durante envío
@@ -77,12 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('previewMessage').textContent = formData.get('message');
                 
                 if (photoFile) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        document.getElementById('previewImage').innerHTML = 
-                            `<img src="${e.target.result}" alt="Tu foto" style="max-width: 200px; border-radius: 10px; margin-top: 1rem;">`;
-                    };
-                    reader.readAsDataURL(photoFile);
+                    // Usar la imagen ya convertida
+                    const imageData = photoInput.convertedImage || formData.get('photo');
+                    document.getElementById('previewImage').innerHTML = 
+                        `<img src="${imageData}" alt="Tu foto" style="max-width: 200px; border-radius: 10px; margin-top: 1rem;">`;
                 }
             } else {
                 throw new Error('Error al enviar el mensaje');
@@ -102,6 +111,62 @@ function fileToBase64(file) {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Convertir cualquier imagen (incluyendo HEIC) a formato web compatible
+async function convertImageToWebFormat(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            const img = new Image();
+            
+            img.onload = () => {
+                // Crear canvas para convertir imagen
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Calcular dimensiones manteniendo aspect ratio (max 1920px)
+                let width = img.width;
+                let height = img.height;
+                const maxSize = 1920;
+                
+                if (width > maxSize || height > maxSize) {
+                    if (width > height) {
+                        height = (height / width) * maxSize;
+                        width = maxSize;
+                    } else {
+                        width = (width / height) * maxSize;
+                        height = maxSize;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Dibujar imagen en canvas
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Convertir a JPEG con calidad 0.85
+                const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                resolve(jpegDataUrl);
+            };
+            
+            img.onerror = () => {
+                reject(new Error('No se pudo cargar la imagen'));
+            };
+            
+            // Cargar la imagen desde el FileReader
+            img.src = e.target.result;
+        };
+        
+        reader.onerror = () => {
+            reject(new Error('Error al leer el archivo'));
+        };
+        
+        // Leer archivo como Data URL
         reader.readAsDataURL(file);
     });
 }
