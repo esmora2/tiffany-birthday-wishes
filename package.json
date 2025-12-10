@@ -1,0 +1,21 @@
+{
+  "name": "tiffany-birthday-wishes",
+  "version": "1.0.0",
+  "description": "Birthday wishes board for Tiffany - Dec 10, 2025",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build needed - static site'",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": ["birthday", "wishes", "netlify"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@netlify/functions": "^2.4.0",
+    "@netlify/blobs": "^7.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

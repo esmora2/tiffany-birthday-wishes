@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Birthday Wishes</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Panel de Administración</h1>
+            <p>Gestiona los mensajes de cumpleaños</p>
+        </div>
+
+        <div class="card">
+            <ul class="admin-list" id="adminList">
+                <!-- Los mensajes se cargarán aquí -->
+            </ul>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h3>📭 No hay mensajes</h3>
+                <p>Los mensajes aparecerán aquí conforme lleguen</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

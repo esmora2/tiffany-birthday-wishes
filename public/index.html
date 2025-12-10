@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Cumpleaños Tiffany 🎂</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Feliz Cumpleaños Tiffany 🎂</h1>
+            <p>Déjale un mensaje de cumpleaños especial</p>
+        </div>
+
+        <!-- Formulario de deseos -->
+        <div class="card" id="formCard">
+            <form id="wishForm">
+                <div class="form-group">
+                    <label for="name">Tu nombre *</label>
+                    <input type="text" id="name" name="name" required placeholder="¿Quién le desea feliz cumpleaños?">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Tu mensaje de cumpleaños *</label>
+                    <textarea id="message" name="message" required placeholder="Escribe tus mejores deseos para Tiffany..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo">Añade una foto (opcional)</label>
+                    <label for="photo" class="file-upload-btn">
+                        📷 Seleccionar foto
+                    </label>
+                    <input type="file" id="photo" name="photo" accept="image/*">
+                    <span class="file-name" id="fileName"></span>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Enviar mensaje de cumpleaños 💝
+                </button>
+            </form>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div class="success-message" id="successMessage">
+            <h2>¡Mensaje enviado! 🎊</h2>
+            <p>Gracias por los buenos deseos y por el cariño a Tiffany</p>
+            
+            <div class="preview-card">
+                <p><strong>Tu mensaje:</strong></p>
+                <p id="previewName"></p>
+                <p id="previewMessage"></p>
+                <div id="previewImage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/form.js"></script>
+</body>
+</html>
