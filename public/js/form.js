@@ -1,3 +1,106 @@
+// form.js - Manejo del formulario de mensajes (LIMPIO)
+const cleanFormJs = (() => {
+    // Single, minimal, well-formed implementation
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('wishForm');
+        const photoInput = document.getElementById('photo');
+        const fileName = document.getElementById('fileName');
+        const imagePreview = document.getElementById('imagePreview');
+        const submitBtn = document.getElementById('submitBtn');
+        const formCard = document.getElementById('formCard');
+        const successMessage = document.getElementById('successMessage');
+
+        photoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                fileName.textContent = '';
+                imagePreview.innerHTML = '';
+                delete photoInput.convertedImage;
+                return;
+            }
+            fileName.textContent = file.name;
+            try {
+                const convertedImage = await convertImageToWebFormat(file);
+                imagePreview.innerHTML = `<img src="${convertedImage}" alt="Preview">`;
+                photoInput.convertedImage = convertedImage;
+            } catch (err) {
+                console.error(err);
+                alert('Hubo un problema al procesar tu imagen. Intenta con otra foto.');
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const now = new Date();
+            const deadline = new Date('2025-12-11T21:00:00');
+            if (now > deadline) {
+                alert('Lo sentimos, el período para enviar mensajes ha terminado.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value.trim());
+            formData.append('message', document.getElementById('message').value.trim());
+            const photoFile = photoInput.files[0];
+            if (photoFile) formData.append('photo', photoInput.convertedImage || await convertImageToWebFormat(photoFile));
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Enviando...';
+            try {
+                const res = await fetch('/.netlify/functions/save-wish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formData.get('name'),
+                        message: formData.get('message'),
+                        photo: formData.get('photo') || null,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                if (!res.ok) throw new Error('Network error');
+                formCard.style.display = 'none';
+                successMessage.classList.add('active');
+            } catch (err) {
+                console.error(err);
+                alert('Hubo un error al enviar tu mensaje. Por favor intenta de nuevo.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar mensaje de cumpleaños 💝';
+            }
+        });
+    });
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function convertImageToWebFormat(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let w = img.width, h = img.height; const max = 1920;
+                    if (w > max || h > max) {
+                        if (w > h) { h = Math.round((h / w) * max); w = max; } else { w = Math.round((w / h) * max); h = max; }
+                    }
+                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.85));
+                };
+                img.onerror = () => reject(new Error('No se pudo cargar la imagen'));
+                img.src = e.target.result;
+            };
+            reader.onerror = () => reject(new Error('Error al leer el archivo'));
+            reader.readAsDataURL(file);
+        });
+    }
+})();
 // form.js - Manejo del formulario de mensajes
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('wishForm');
@@ -43,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Validar fecha límite (21:00 del 11 de diciembre de 2025)
         const now = new Date();
-        const deadline = new Date('2025-12-11T20:00:00-06:00'); // Ajusta timezone si necesario
+        const deadline = new Date('2025-12-11T21:00:00'); // local 21:00
         
         if (now > deadline) {
             alert('Lo sentimos, el período para enviar mensajes ha terminado.');
