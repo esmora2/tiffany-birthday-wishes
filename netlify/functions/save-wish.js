@@ -40,9 +40,9 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Verificar fecha límite (8pm del 10 de diciembre 2025)
-    const now = new Date();
-    const deadline = new Date('2025-12-10T20:00:00-06:00');
+  // Verificar fecha límite (21:00 del 11 de diciembre de 2025)
+  const now = new Date();
+  const deadline = new Date('2025-12-11T20:00:00-06:00');
     
     if (now > deadline) {
       return {

@@ -1,6 +1,6 @@
 # 🎂 Tiffany Birthday Wishes Board
 
-Aplicación web para recopilar mensajes de cumpleaños para Tiffany (10 de diciembre, 2025).
+Aplicación web para recopilar mensajes de cumpleaños para Tiffany (11 de diciembre, 2025).
 
 ## 🎨 Características
 
@@ -80,7 +80,7 @@ Añade estas variables para almacenar imágenes en S3:
 
 ## 🎯 Límite de tiempo
 
-El formulario acepta mensajes hasta las **8:00 PM del 10 de diciembre de 2025**.
+El formulario acepta mensajes hasta las **21:00 del 11 de diciembre de 2025**.
 Después de esa hora, se mostrará un mensaje indicando que el período ha terminado.
 
 ## 🎨 Personalización de colores
